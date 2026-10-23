@@ -10,8 +10,8 @@ int main()
   int max1 = num;
   int max2 = 0;
   int current_element = num;
-  size_t current_streak = 1;
-  size_t max_streak = 1;
+  int current_streak = 1;
+  int max_streak = 1;
   while ((std::cin >> num) && (num != 0))
   {
     if (num > max1)
