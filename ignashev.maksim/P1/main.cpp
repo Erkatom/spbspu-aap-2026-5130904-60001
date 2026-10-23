@@ -7,14 +7,11 @@ int main()
   {
     return 2;
   }
-  
   int max1 = num;
   int max2 = 0;
-  
   int current_element = num;
   size_t current_streak = 1;
   size_t max_streak = 1;
-  
   while ((std::cin >> num) && (num != 0))
   {
     if (num > max1)
@@ -30,7 +27,6 @@ int main()
     {
       max2 = num;
     }
-
     if (num == current_element)
     {
       current_streak++;
@@ -45,17 +41,14 @@ int main()
       current_streak = 1;
     }
   }
-
   if (current_streak > max_streak)
   {
     max_streak = current_streak;
   }
-  
   if (max2 == 0)
   {
     return 2;
   }
-  
   std::cout << max2 << "\n" << max_streak << "\n";
   return 0;
 }
