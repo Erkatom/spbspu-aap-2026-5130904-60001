@@ -7,10 +7,9 @@ namespace ignashev {
     for (int i = 1; i < rows - 1; ++i) {
       for (int j = 1; j < cols - 1; ++j) {
         const int current = matrix[i][j];
-
-        if ((current > matrix[i - 1][j]) && 
-            (current > matrix[i + 1][j]) && 
-            (current > matrix[i][j - 1]) && 
+        if ((current > matrix[i - 1][j]) &&
+            (current > matrix[i + 1][j]) &&
+            (current > matrix[i][j - 1]) &&
             (current > matrix[i][j + 1])) {
           ++count;
         }
@@ -27,7 +26,7 @@ namespace ignashev {
     int r = bottom;
     int c = left;
     int decrement = 1;
-    int direction = 0; 
+    int direction = 0;
     const int totalElements = rows * cols;
     for (int step = 0; step < totalElements; ++step) {
       matrix[r][c] -= decrement;
