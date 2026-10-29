@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstddef>
 
 int main()
 {
@@ -10,8 +11,8 @@ int main()
   int max1 = num;
   int max2 = 0;
   int current_element = num;
-  int current_streak = 1;
-  int max_streak = 1;
+  size_t current_streak = 1;
+  size_t max_streak = 1;
   while ((std::cin >> num) && (num != 0))
   {
     if (num > max1)
@@ -20,10 +21,6 @@ int main()
       max1 = num;
     }
     else if ((num > max2) && (num < max1))
-    {
-      max2 = num;
-    }
-    else if ((max1 == max2) && (num < max1))
     {
       max2 = num;
     }
