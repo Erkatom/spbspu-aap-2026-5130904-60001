@@ -12,7 +12,7 @@ int main()
   size_t count = 0;
   while ((std::cin >> num) && (num != 0))
   {
-    count++
+    count++;
     if (count == 1)
     {
       max1 = num;
