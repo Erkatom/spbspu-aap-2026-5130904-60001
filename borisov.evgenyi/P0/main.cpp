@@ -1,8 +1,6 @@
-#include<iostream>
+#include <iostream>
 
-int main()
+int main() 
 {
-  std::cout<<"borisov.evgenyi\n";
-  return 0;
+  std::cout << "borisov.evgenyi\n";
 }
-
