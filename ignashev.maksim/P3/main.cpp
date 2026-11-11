@@ -2,8 +2,7 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace ignashev
-{
+namespace ignashev {
   int countLocalMax(const int* const* matrix, int rows, int cols)
   {
     if (rows < 3 || cols < 3) {
@@ -90,7 +89,7 @@ namespace ignashev
   }
   int** allocateMatrix(int rows, int cols)
   {
-    int** matrix = new int*[rows];
+    int** const matrix = new int*[rows];
     for (int i = 0; i < rows; ++i) {
       matrix[i] = nullptr;
     }
@@ -131,11 +130,11 @@ int main(int argc, char* argv[])
     std::cerr << "invalid number of arguments\n";
     return 1;
   }
-  int taskNum = 0;
+  int task_num = 0;
   try {
     std::size_t pos = 0;
-    taskNum = std::stoi(argv[1], &pos);
-    if (argv[1][pos] != '\0' || (taskNum != 1 && taskNum != 2)) {
+    task_num = std::stoi(argv[1], &pos);
+    if (argv[1][pos] != '\0' || (task_num != 1 && task_num != 2)) {
       std::cerr << "first argument must be 1 or 2\n";
       return 1;
     }
@@ -160,7 +159,7 @@ int main(int argc, char* argv[])
     return 2;
   }
   if (rows == 0 && cols == 0) {
-    if (taskNum == 1) {
+    if (task_num == 1) {
       output << 0 << "\n";
     } else {
       output << "0 0\n";
@@ -175,7 +174,7 @@ int main(int argc, char* argv[])
   try {
     matrix = ignashev::allocateMatrix(rows, cols);
     ignashev::readMatrix(input, matrix, rows, cols);
-    if (taskNum == 1) {
+    if (task_num == 1) {
       output << ignashev::countLocalMax(matrix, rows, cols) << "\n";
     } else {
       ignashev::transformLeftBotClockwise(matrix, rows, cols);
