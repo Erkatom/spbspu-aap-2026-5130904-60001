@@ -14,8 +14,12 @@ namespace ignashev {
     for (std::size_t i = 1; i < rows - 1; ++i) {
       for (std::size_t j = 1; j < cols - 1; ++j) {
         const int current = matrix[i * cols + j];
-        const bool isGreaterVertical = (current > matrix[(i - 1) * cols + j]) && (current > matrix[(i + 1) * cols + j]);
-        const bool isGreaterHorizontal = (current > matrix[i * cols + (j - 1)]) && (current > matrix[i * cols + (j + 1)]);
+        const bool isGreaterTop = current > matrix[(i - 1) * cols + j];
+        const bool isGreaterBottom = current > matrix[(i + 1) * cols + j];
+        const bool isGreaterVertical = isGreaterTop && isGreaterBottom;
+        const bool isGreaterLeft = current > matrix[i * cols + (j - 1)];
+        const bool isGreaterRight = current > matrix[i * cols + (j + 1)];
+        const bool isGreaterHorizontal = isGreaterLeft && isGreaterRight;
         if (isGreaterVertical && isGreaterHorizontal) {
           ++count;
         }
@@ -146,32 +150,32 @@ int main(int argc, char* argv[])
     return 2;
   }
   const std::size_t maxFixedSize = 10000;
-  int fixedMatrix[maxFixedSize] = {};
-  int* dynamicMatrix = nullptr;
+  int fixed_matrix[maxFixedSize] = {};
+  int* dynamic_matrix = nullptr;
   int* matrix = nullptr;
   if (task_num == 1) {
     if (rows * cols > maxFixedSize) {
       std::cerr << "matrix size exceeds fixed limit\n";
       return 2;
     }
-    matrix = fixedMatrix;
+    matrix = fixed_matrix;
   } else {
     try {
-      dynamicMatrix = new int[rows * cols];
-      matrix = dynamicMatrix;
+      dynamic_matrix = new int[rows * cols];
+      matrix = dynamic_matrix;
     } catch (const std::bad_alloc& e) {
       std::cerr << e.what() << "\n";
       return 2;
     }
   }
   if (!ignashev::readMatrix(input, matrix, rows, cols)) {
-    delete[] dynamicMatrix;
+    delete[] dynamic_matrix;
     std::cerr << "failed to read matrix element\n";
     return 2;
   }
   output << ignashev::countLocalMax(matrix, rows, cols) << "\n";
   ignashev::transformLeftBotClockwise(matrix, rows, cols);
   ignashev::printMatrix(output, matrix, rows, cols) << "\n";
-  delete[] dynamicMatrix;
+  delete[] dynamic_matrix;
   return 0;
 }
