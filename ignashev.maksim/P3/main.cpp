@@ -1,19 +1,21 @@
 #include <iostream>
 #include <fstream>
+#include <cstddef>
+#include <memory>
 #include <stdexcept>
 
 namespace ignashev {
-  int countLocalMax(const int* const* matrix, int rows, int cols)
+  std::size_t countLocalMax(const int* matrix, std::size_t rows, std::size_t cols)
   {
     if (rows < 3 || cols < 3) {
       return 0;
     }
-    int count = 0;
-    for (int i = 1; i < rows - 1; ++i) {
-      for (int j = 1; j < cols - 1; ++j) {
-        const int current = matrix[i][j];
-        const bool isGreaterVertical = (current > matrix[i - 1][j]) && (current > matrix[i + 1][j]);
-        const bool isGreaterHorizontal = (current > matrix[i][j - 1]) && (current > matrix[i][j + 1]);
+    std::size_t count = 0;
+    for (std::size_t i = 1; i < rows - 1; ++i) {
+      for (std::size_t j = 1; j < cols - 1; ++j) {
+        const int current = matrix[i * cols + j];
+        const bool isGreaterVertical = (current > matrix[(i - 1) * cols + j]) && (current > matrix[(i + 1) * cols + j]);
+        const bool isGreaterHorizontal = (current > matrix[i * cols + (j - 1)]) && (current > matrix[i * cols + (j + 1)]);
         if (isGreaterVertical && isGreaterHorizontal) {
           ++count;
         }
@@ -21,26 +23,26 @@ namespace ignashev {
     }
     return count;
   }
-  void transformLeftBotClockwise(int** matrix, int rows, int cols)
+  void transformLeftBotClockwise(int* matrix, std::size_t rows, std::size_t cols)
   {
-    if (rows <= 0 || cols <= 0) {
+    if (rows == 0 || cols == 0) {
       return;
     }
-    int top = 0;
-    int bottom = rows - 1;
-    int left = 0;
-    int right = cols - 1;
-    int r = bottom;
-    int c = left;
+    std::size_t top = 0;
+    std::size_t bottom = rows - 1;
+    std::size_t left = 0;
+    std::size_t right = cols - 1;
+    std::size_t r = bottom;
+    std::size_t c = left;
     int decrement = 1;
     const int dirUp = 0;
     const int dirRight = 1;
     const int dirDown = 2;
     const int dirLeft = 3;
     int direction = dirUp;
-    const int totalElements = rows * cols;
-    for (int step = 0; step < totalElements; ++step) {
-      matrix[r][c] -= decrement;
+    const std::size_t totalElements = rows * cols;
+    for (std::size_t step = 0; step < totalElements; ++step) {
+      matrix[r * cols + c] -= decrement;
       ++decrement;
       if (direction == dirUp) {
         if (r > top) {
@@ -77,51 +79,24 @@ namespace ignashev {
       }
     }
   }
-  void freeMatrix(int** matrix, int rows)
+  std::istream& readMatrix(std::istream& in, int* matrix, std::size_t rows, std::size_t cols)
   {
-    if (matrix == nullptr) {
-      return;
-    }
-    for (int i = 0; i < rows; ++i) {
-      delete[] matrix[i];
-    }
-    delete[] matrix;
-  }
-  int** allocateMatrix(int rows, int cols)
-  {
-    int** const matrix = new int*[rows];
-    for (int i = 0; i < rows; ++i) {
-      matrix[i] = nullptr;
-    }
-    try {
-      for (int i = 0; i < rows; ++i) {
-        matrix[i] = new int[cols];
-      }
-    } catch (const std::bad_alloc&) {
-      freeMatrix(matrix, rows);
-      throw;
-    }
-    return matrix;
-  }
-  void readMatrix(std::istream& in, int** matrix, int rows, int cols)
-  {
-    for (int i = 0; i < rows; ++i) {
-      for (int j = 0; j < cols; ++j) {
-        if (!(in >> matrix[i][j])) {
-          throw std::runtime_error("failed to read matrix element");
-        }
+    const std::size_t totalElements = rows * cols;
+    for (std::size_t i = 0; i < totalElements; ++i) {
+      if (!(in >> matrix[i])) {
+        return in;
       }
     }
+    return in;
   }
-  void printMatrix(std::ostream& out, const int* const* matrix, int rows, int cols)
+  std::ostream& printMatrix(std::ostream& out, const int* matrix, std::size_t rows, std::size_t cols)
   {
     out << rows << " " << cols;
-    for (int i = 0; i < rows; ++i) {
-      for (int j = 0; j < cols; ++j) {
-        out << " " << matrix[i][j];
-      }
+    const std::size_t totalElements = rows * cols;
+    for (std::size_t i = 0; i < totalElements; ++i) {
+      out << " " << matrix[i];
     }
-    out << "\n";
+    return out;
   }
 }
 int main(int argc, char* argv[])
@@ -133,13 +108,16 @@ int main(int argc, char* argv[])
   int task_num = 0;
   try {
     std::size_t pos = 0;
-    task_num = std::stoi(argv[1], &pos);
+    task_num = std::stoi(argv[1], std::addressof(pos));
     if (argv[1][pos] != '\0' || (task_num != 1 && task_num != 2)) {
       std::cerr << "first argument must be 1 or 2\n";
       return 1;
     }
-  } catch (const std::exception&) {
+  } catch (const std::invalid_argument&) {
     std::cerr << "invalid task number\n";
+    return 1;
+  } catch (const std::out_of_range&) {
+    std::cerr << "task number is out of range\n";
     return 1;
   }
   std::ifstream input(argv[2]);
@@ -152,39 +130,48 @@ int main(int argc, char* argv[])
     std::cerr << "cannot open output file\n";
     return 2;
   }
-  int rows = 0;
-  int cols = 0;
-  if (!(input >> rows >> cols) || rows < 0 || cols < 0) {
+  std::size_t rows = 0;
+  std::size_t cols = 0;
+  if (!(input >> rows >> cols)) {
     std::cerr << "invalid matrix dimensions\n";
     return 2;
   }
   if (rows == 0 && cols == 0) {
-    if (task_num == 1) {
-      output << 0 << "\n";
-    } else {
-      output << "0 0\n";
-    }
+    output << 0 << "\n";
+    output << "0 0\n";
     return 0;
   }
   if (rows == 0 || cols == 0) {
     std::cerr << "invalid zero dimension\n";
     return 2;
   }
-  int** matrix = nullptr;
-  try {
-    matrix = ignashev::allocateMatrix(rows, cols);
-    ignashev::readMatrix(input, matrix, rows, cols);
-    if (task_num == 1) {
-      output << ignashev::countLocalMax(matrix, rows, cols) << "\n";
-    } else {
-      ignashev::transformLeftBotClockwise(matrix, rows, cols);
-      ignashev::printMatrix(output, matrix, rows, cols);
+  const std::size_t maxFixedSize = 10000;
+  int fixedMatrix[maxFixedSize] = {};
+  int* dynamicMatrix = nullptr;
+  int* matrix = nullptr;
+  if (task_num == 1) {
+    if (rows * cols > maxFixedSize) {
+      std::cerr << "matrix size exceeds fixed limit\n";
+      return 2;
     }
-  } catch (const std::exception& e) {
-    ignashev::freeMatrix(matrix, rows);
-    std::cerr << e.what() << "\n";
+    matrix = fixedMatrix;
+  } else {
+    try {
+      dynamicMatrix = new int[rows * cols];
+      matrix = dynamicMatrix;
+    } catch (const std::bad_alloc& e) {
+      std::cerr << e.what() << "\n";
+      return 2;
+    }
+  }
+  if (!ignashev::readMatrix(input, matrix, rows, cols)) {
+    delete[] dynamicMatrix;
+    std::cerr << "failed to read matrix element\n";
     return 2;
   }
-  ignashev::freeMatrix(matrix, rows);
+  output << ignashev::countLocalMax(matrix, rows, cols) << "\n";
+  ignashev::transformLeftBotClockwise(matrix, rows, cols);
+  ignashev::printMatrix(output, matrix, rows, cols) << "\n";
+  delete[] dynamicMatrix;
   return 0;
 }
