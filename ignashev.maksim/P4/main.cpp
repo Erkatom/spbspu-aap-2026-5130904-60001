@@ -18,9 +18,9 @@ namespace {
       return 0;
     }
     const int lower = std::tolower(uch);
-    const int isVowel = (lower == 'a') || (lower == 'e') || (lower == 'i')
-        || (lower == 'o') || (lower == 'u') || (lower == 'y');
-    return isVowel ? 1 : 0;
+    const int isFirstGroup = (lower == 'a') || (lower == 'e') || (lower == 'i');
+    const int isSecondGroup = (lower == 'o') || (lower == 'u') || (lower == 'y');
+    return (isFirstGroup || isSecondGroup) ? 1 : 0;
   }
 }
 
@@ -38,18 +38,18 @@ char* ignashev::readLine(std::istream& in)
   while ((in >> current) && (current != '\n')) {
     if (length + nullTermSpace == capacity) {
       const size_t newCapacity = capacity * growthFactor;
-      char* newBuffer = nullptr;
+      char* new_buffer = nullptr;
       try {
-        newBuffer = new char[newCapacity];
+        new_buffer = new char[newCapacity];
       } catch (const std::bad_alloc&) {
         delete[] buffer;
         throw;
       }
       for (size_t i = 0; i < length; ++i) {
-        newBuffer[i] = buffer[i];
+        new_buffer[i] = buffer[i];
       }
       delete[] buffer;
-      buffer = newBuffer;
+      buffer = new_buffer;
       capacity = newCapacity;
     }
     buffer[length] = current;
@@ -97,14 +97,14 @@ int ignashev::hasRepeatedDigits(const char* str)
 
 char* ignashev::removeVowels(char* dest, const char* src)
 {
-  size_t destIndex = 0;
+  size_t dest_index = 0;
   for (size_t i = 0; src[i] != '\0'; ++i) {
     if (isLatinVowel(src[i]) == 0) {
-      dest[destIndex] = src[i];
-      ++destIndex;
+      dest[dest_index] = src[i];
+      ++dest_index;
     }
   }
-  dest[destIndex] = '\0';
+  dest[dest_index] = '\0';
   return dest;
 }
 
@@ -125,9 +125,9 @@ int main()
 
   const size_t nullTermSpace = 1;
   const size_t length = ignashev::getStringLength(input);
-  char* withoutVowels = nullptr;
+  char* without_vowels = nullptr;
   try {
-    withoutVowels = new char[length + nullTermSpace];
+    without_vowels = new char[length + nullTermSpace];
   } catch (const std::bad_alloc&) {
     delete[] input;
     std::cerr << "Memory allocation failed\n";
@@ -135,12 +135,12 @@ int main()
   }
 
   const int repeatedDigits = ignashev::hasRepeatedDigits(input);
-  ignashev::removeVowels(withoutVowels, input);
+  ignashev::removeVowels(without_vowels, input);
 
   std::cout << repeatedDigits << '\n';
-  std::cout << withoutVowels << '\n';
+  std::cout << without_vowels << '\n';
 
-  delete[] withoutVowels;
+  delete[] without_vowels;
   delete[] input;
   return 0;
 }
