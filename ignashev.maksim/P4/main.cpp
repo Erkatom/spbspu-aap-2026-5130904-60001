@@ -18,29 +18,29 @@ namespace {
       return 0;
     }
     const int lower = std::tolower(uch);
-    const int isFirstGroup = (lower == 'a') || (lower == 'e') || (lower == 'i');
-    const int isSecondGroup = (lower == 'o') || (lower == 'u') || (lower == 'y');
-    return (isFirstGroup || isSecondGroup) ? 1 : 0;
+    const int is_first_group = (lower == 'a') || (lower == 'e') || (lower == 'i');
+    const int is_second_group = (lower == 'o') || (lower == 'u') || (lower == 'y');
+    return (is_first_group || is_second_group) ? 1 : 0;
   }
 }
 
 char* ignashev::readLine(std::istream& in)
 {
-  const size_t initialCapacity = 16;
-  const size_t growthFactor = 2;
-  const size_t nullTermSpace = 1;
-  size_t capacity = initialCapacity;
+  const size_t initial_capacity = 16;
+  const size_t growth_factor = 2;
+  const size_t null_term_space = 1;
+  size_t capacity = initial_capacity;
   size_t length = 0;
   char* buffer = new char[capacity];
   char current = 0;
 
   in >> std::noskipws;
   while ((in >> current) && (current != '\n')) {
-    if (length + nullTermSpace == capacity) {
-      const size_t newCapacity = capacity * growthFactor;
+    if (length + null_term_space == capacity) {
+      const size_t new_capacity = capacity * growth_factor;
       char* new_buffer = nullptr;
       try {
-        new_buffer = new char[newCapacity];
+        new_buffer = new char[new_capacity];
       } catch (const std::bad_alloc&) {
         delete[] buffer;
         throw;
@@ -50,7 +50,7 @@ char* ignashev::readLine(std::istream& in)
       }
       delete[] buffer;
       buffer = new_buffer;
-      capacity = newCapacity;
+      capacity = new_capacity;
     }
     buffer[length] = current;
     ++length;
@@ -77,22 +77,22 @@ size_t ignashev::getStringLength(const char* str)
 
 int ignashev::hasRepeatedDigits(const char* str)
 {
-  const size_t digitsCount = 10;
+  const size_t digits_count = 10;
   const int found = 1;
-  const int notFound = 0;
-  size_t counts[digitsCount] = {};
+  const int not_found = 0;
+  size_t counts[digits_count] = {};
 
   for (size_t i = 0; str[i] != '\0'; ++i) {
     const unsigned char uch = static_cast< unsigned char >(str[i]);
     if (std::isdigit(uch)) {
-      const size_t digitIndex = static_cast< size_t >(str[i] - '0');
-      ++counts[digitIndex];
-      if (counts[digitIndex] > found) {
+      const size_t digit_index = static_cast< size_t >(str[i] - '0');
+      ++counts[digit_index];
+      if (counts[digit_index] > found) {
         return found;
       }
     }
   }
-  return notFound;
+  return not_found;
 }
 
 char* ignashev::removeVowels(char* dest, const char* src)
@@ -123,21 +123,21 @@ int main()
     return 1;
   }
 
-  const size_t nullTermSpace = 1;
+  const size_t null_term_space = 1;
   const size_t length = ignashev::getStringLength(input);
   char* without_vowels = nullptr;
   try {
-    without_vowels = new char[length + nullTermSpace];
+    without_vowels = new char[length + null_term_space];
   } catch (const std::bad_alloc&) {
     delete[] input;
     std::cerr << "Memory allocation failed\n";
     return 1;
   }
 
-  const int repeatedDigits = ignashev::hasRepeatedDigits(input);
+  const int repeated_digits = ignashev::hasRepeatedDigits(input);
   ignashev::removeVowels(without_vowels, input);
 
-  std::cout << repeatedDigits << '\n';
+  std::cout << repeated_digits << '\n';
   std::cout << without_vowels << '\n';
 
   delete[] without_vowels;
